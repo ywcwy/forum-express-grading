@@ -2,7 +2,6 @@ const db = require('../models')
 const Restaurant = db.Restaurant
 const User = db.User
 const imgur = require('imgur-node-api')
-const userController = require('./userController')
 const IMGUR_CLIENT_ID = '439379e8b7ad59e'
 const adminController = {
   getRestaurants: (req, res) => {
