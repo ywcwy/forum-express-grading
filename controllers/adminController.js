@@ -11,9 +11,7 @@ const adminController = {
       nest: true,
       include: [Category]
     })
-      .then(restaurants => {
-        res.render('admin/restaurants', { restaurants })
-      })
+      .then(restaurants => res.render('admin/restaurants', { restaurants }))
   },
   createRestaurant: (req, res) => {
     Category.findAll({ raw: true, nest: true })
