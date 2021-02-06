@@ -47,10 +47,7 @@ const adminController = {
   },
   getRestaurant: (req, res) => {
     Restaurant.findByPk(req.params.id, { include: [Category] })
-      .then(restaurant => {
-        console.log(restaurant)
-        res.render('admin/restaurant', { restaurant: restaurant.toJSON() })
-      })
+      .then(restaurant => res.render('admin/restaurant', { restaurant: restaurant.toJSON() }))
   },
   editRestaurant: (req, res) => {
     Category.findAll({ raw: true, nest: true })
