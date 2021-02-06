@@ -15,7 +15,12 @@ const adminController = {
         res.render('admin/restaurants', { restaurants })
       })
   },
-  createRestaurant: (req, res) => res.render('admin/create'),
+  createRestaurant: (req, res) => {
+    Category.findAll({ raw: true, nest: true })
+      .then(categories => {
+        res.render('admin/create', { categories })
+      })
+  },
   postRestaurant: (req, res) => {
     const { name, tel, address, opening_hours, description } = req.body
     if (!name) {
@@ -26,14 +31,14 @@ const adminController = {
     if (file) {
       imgur.setClientID(IMGUR_CLIENT_ID)
       imgur.upload(file.path, (err, img) => {
-        return Restaurant.create({ name, tel, address, opening_hours, description, image: file ? img.data.link : null })
+        return Restaurant.create({ name, tel, address, opening_hours, description, image: file ? img.data.link : null, CategoryId: req.body.categoryId })
           .then(() => {
             req.flash('success_messages', '餐廳新增成功。')
             return res.redirect('/admin/restaurants')
           })
       })
     } else {
-      return Restaurant.create({ name, tel, address, opening_hours, description, image: null })
+      return Restaurant.create({ name, tel, address, opening_hours, description, image: null, CategoryId: req.body.categoryId })
         .then(() => {
           req.flash('success_messages', '餐廳新增成功。')
           return res.redirect('/admin/restaurants')
@@ -43,12 +48,16 @@ const adminController = {
   getRestaurant: (req, res) => {
     Restaurant.findByPk(req.params.id, { include: [Category] })
       .then(restaurant => {
+        console.log(restaurant)
         res.render('admin/restaurant', { restaurant: restaurant.toJSON() })
       })
   },
   editRestaurant: (req, res) => {
-    Restaurant.findByPk(req.params.id, { raw: true })
-      .then(restaurant => res.render('admin/create', { restaurant }))
+    Category.findAll({ raw: true, nest: true })
+      .then(categories => {
+        Restaurant.findByPk(req.params.id, { raw: true })
+          .then(restaurant => res.render('admin/create', { restaurant, categories }))
+      })
   },
   putRestaurant: (req, res) => {
     const { name, tel, address, opening_hours, description } = req.body
@@ -62,7 +71,7 @@ const adminController = {
       imgur.upload(file.path, (err, img) => {
         return Restaurant.findByPk(req.params.id)
           .then(restaurant => {
-            restaurant.update({ name, tel, address, opening_hours, description, image: file ? img.data.link : restaurant.image })
+            restaurant.update({ name, tel, address, opening_hours, description, image: file ? img.data.link : restaurant.image, CategoryId: req.body.categoryId })
               .then(() => {
                 req.flash('success_messages', '餐廳更新成功。')
                 res.redirect('/admin/restaurants')
@@ -72,7 +81,7 @@ const adminController = {
     } else {
       return Restaurant.findByPk(req.params.id)
         .then(restaurant => {
-          restaurant.update({ name, tel, address, opening_hours, description, image: restaurant.image })
+          restaurant.update({ name, tel, address, opening_hours, description, image: restaurant.image, CategoryId: req.body.categoryId })
             .then(() => {
               req.flash('success_messages', '餐廳更新成功。')
               res.redirect('/admin/restaurants')
