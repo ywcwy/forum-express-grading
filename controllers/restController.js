@@ -2,25 +2,33 @@ const db = require('../models')
 const categoryController = require('./categoryController')
 const Restaurant = db.Restaurant
 const Category = db.Category
+const pageLimit = 9 // 一頁限九筆資料
 const restControllers = {
   getRestaurants: (req, res) => {
+    let offset = 0 // 分頁的偏移量
     const whereQuery = {}
     let categoryId = ''
+    if (req.query.page) { // 如果有點按頁面
+      offset = (req.query.page - 1) * pageLimit
+    }
     if (req.query.categoryId) {
       categoryId = Number(req.query.categoryId)
       whereQuery.CategoryId = categoryId
     }
-    Restaurant.findAll({ include: Category, where: whereQuery })
-      .then(restaurants => {
-        const data = restaurants.map(r =>
-        ({
+    Restaurant.findAndCountAll({ include: Category, where: whereQuery, offset, limit: pageLimit })
+      .then(result => {  // 使用 findAndCountAll 會得到 count(資料量) 和 rows(餐廳資料集合)
+        const page = Number(req.query.page) || 1  // 現在的頁面
+        const pages = Math.ceil(result.count / pageLimit)  // 無條件進位，算出共會有多少分頁
+        const totalPages = Array.from({ length: pages }).map((item, index) => index + 1)
+        const prev = page - 1 < 1 ? 1 : page - 1 // 前一頁
+        const next = page + 1 > pages ? pages : page + 1 // 下一頁
+        const data = result.rows.map(r => ({
           ...r.dataValues,
           description: r.dataValues.description.substring(0, 50),
           categoryName: r.Category.name
-        })
-        )
+        }))
         Category.findAll({ raw: true, nest: true })
-          .then(categories => res.render('restaurants', { restaurants: data, categories, categoryId }))
+          .then(categories => res.render('restaurants', { restaurants: data, categories, categoryId, totalPages, next, prev }))
       })
   },
   getRestaurant: (req, res) => {
