@@ -1,7 +1,8 @@
 const db = require('../models')
-const categoryController = require('./categoryController')
 const Restaurant = db.Restaurant
 const Category = db.Category
+const Comment = db.Comment
+const User = db.User
 const pageLimit = 9 // 一頁限九筆資料
 const restControllers = {
   getRestaurants: (req, res) => {
@@ -32,8 +33,9 @@ const restControllers = {
       })
   },
   getRestaurant: (req, res) => {
-    Restaurant.findByPk(req.params.id, { include: Category })
-      .then(restaurant => res.render('restaurant', { restaurant: restaurant.toJSON() }))
+    Restaurant.findByPk(req.params.id, { include: [Category, { model: Comment, include: [User] }] })
+      .then(restaurant => res.render('restaurant', { restaurant: restaurant.toJSON() })
+      )
   }
 }
 
