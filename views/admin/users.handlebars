@@ -23,7 +23,7 @@
     {{#each users}}
     <tr>
       <th scope="row">{{this.id}}</th>
-      <td>{{this.name}}</td>
+      <td><a href="/users/{{this.id}}">{{this.name}}</a></td>
       <td>{{this.email}}</td>
       <td>{{#if this.isAdmin}}
         admin

@@ -1,0 +1,13 @@
+<div class="d-grid">
+  <img src="{{users.image}}" alt="{{users.name}}" class="col-4"
+    style="width: 250px;  margin-bottom: 25px; border-radius:50%;">
+  <div class="col-8">
+    <h4>{{users.name}}</h4>
+    <p>{{users.email}}</p>
+    {{#ifSelected users.id user.id}}
+    <form action="/users/{{users.id}}/edit" method="GET">
+      <button class="btn btn-info">Edit</button>
+    </form>
+    {{/ifSelected}}
+  </div>
+</div>

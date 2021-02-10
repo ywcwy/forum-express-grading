@@ -1,6 +1,8 @@
 {{#if restaurant}}
+{{!-- edit 頁面用 --}}
 <form action="/admin/restaurants/{{restaurant.id}}?_method=PUT" method="POST" enctype="multipart/form-data">
   {{else}}
+  {{!-- create 頁面用 --}}
   <form action="/admin/restaurants" method="POST" enctype="multipart/form-data">
     {{/if}}
     <div class="form-group">
