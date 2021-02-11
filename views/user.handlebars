@@ -1,13 +1,31 @@
-<div class="d-grid">
-  <img src="{{users.image}}" alt="{{users.name}}" class="col-4"
-    style="width: 250px;  margin-bottom: 25px; border-radius:50%;">
-  <div class="col-8">
-    <h4>{{users.name}}</h4>
-    <p>{{users.email}}</p>
-    {{#ifSelected users.id user.id}}
-    <form action="/users/{{users.id}}/edit" method="GET">
-      <button class="btn btn-info">Edit</button>
-    </form>
-    {{/ifSelected}}
+<div class="d-grid my-5 bg-white border border-light" width="400px" height="200px">
+  <div class="ml-3 row">
+    <img src="{{users.image}}" alt="{{users.name}}" class="col-6 m-3 img-thumbnail rounded"
+      style="max-width: 210px; height: 210px; object-fit: cover">
+    <div class="col-6">
+      <h4 class="my-4 ml-3">{{users.name}}</h4>
+      <p class="my-4 ml-3">{{users.email}}</p>
+      {{#if comments}}
+      <p class="my-4 ml-3">已評論餐廳：{{totalComment}} 則</p>
+      {{else}}
+      <p class="my-4 ml-3">已評論餐廳：0 則</p>
+      {{/if}}
+      {{#ifSelected users.id user.id}}
+      <form action="/users/{{users.id}}/edit" method="GET">
+        <button class="btn btn-info ml-3 mb-3">Edit</button>
+      </form>
+      {{/ifSelected}}
+    </div>
   </div>
 </div>
+{{#if comments}}
+<div class="my-5 border border-secondary p-4" width="400px">
+  <h5 class="mb-4">已評論的餐廳</h5>
+  <div class="bg-white d-flex flex-wrap">
+    {{#each comments}}
+    <a href="/restaurants/{{this.Restaurant.id}}" class="justify-content-around"><img src="{{this.Restaurant.image}}"
+        class="img-thumbnail m-3" width="180px" height="180px"></a>
+    {{/each}}
+  </div>
+</div>
+{{/if}}
