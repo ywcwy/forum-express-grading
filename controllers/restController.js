@@ -42,6 +42,15 @@ const restControllers = {
       Restaurant.findAll({ limit: 10, raw: true, nest: true, order: [['createdAt', 'DESC']], include: [Category] }),
       Comment.findAll({ limit: 10, raw: true, nest: true, order: [['createdAt', 'DESC']], include: [User, Restaurant] })
     ]).then(([restaurants, comments]) => res.render('feeds', { restaurants, comments }))
+  },
+  goDashboard: (req, res) => {
+    return Promise.all([Comment.findAndCountAll({ where: { RestaurantId: req.params.id } }),
+    Restaurant.findByPk(req.params.id, { include: [Category] })])
+      .then(([comments, restaurant]) => {
+        console.log(comments.count)
+        res.render('restaurant', { restaurant: restaurant.toJSON(), count: comments.count })
+      }
+      )
   }
 }
 
