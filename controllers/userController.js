@@ -40,11 +40,11 @@ const userController = {
     res.redirect('/signin')
   },
   getUser: (req, res) => {
-    User.findByPk(req.params.id, { raw: true })
-      .then(user => {
-        Comment.findAll({ where: { UserId: req.params.id }, raw: true, nest: true, include: [Restaurant, User] })
-          .then(comments => res.render('user', { users: user, totalComment: comments.length, comments }))
-      })
+    return Promise.all([
+      User.findByPk(req.params.id, { raw: true }),
+      Comment.findAll({ where: { UserId: req.params.id }, raw: true, nest: true, include: [Restaurant, User] })
+    ])
+      .then(([user, comments]) => res.render('user', { users: user, totalComment: comments.length, comments }))
   },
   editUser: (req, res) => {
     User.findByPk(req.params.id)

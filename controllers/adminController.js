@@ -48,11 +48,8 @@ const adminController = {
       .then(restaurant => res.render('admin/restaurant', { restaurant: restaurant.toJSON() }))
   },
   editRestaurant: (req, res) => {
-    Category.findAll({ raw: true, nest: true })
-      .then(categories => {
-        Restaurant.findByPk(req.params.id, { raw: true })
-          .then(restaurant => res.render('admin/create', { restaurant, categories }))
-      })
+    return Promise.all([Category.findAll({ raw: true, nest: true }), Restaurant.findByPk(req.params.id, { raw: true })])
+      .then(([categories, restaurant]) => res.render('admin/create', { restaurant, categories }))
   },
   putRestaurant: (req, res) => {
     const { name, tel, address, opening_hours, description } = req.body
