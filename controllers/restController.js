@@ -46,11 +46,7 @@ const restControllers = {
   goDashboard: (req, res) => {
     return Promise.all([Comment.findAndCountAll({ where: { RestaurantId: req.params.id } }),
     Restaurant.findByPk(req.params.id, { include: [Category] })])
-      .then(([comments, restaurant]) => {
-        console.log(comments.count)
-        res.render('restaurant', { restaurant: restaurant.toJSON(), count: comments.count })
-      }
-      )
+      .then(([comments, restaurant]) => res.render('dashboard', { restaurant: restaurant.toJSON(), count: comments.count }))
   }
 }
 
