@@ -11,7 +11,8 @@ const commentController = {
   },
   deleteComment: (req, res) => {
     Comment.findByPk(req.params.id)
-      .then(comment => comment.destroy().then(() => res.redirect(`/restaurants/${comment.RestaurantId}`)))
+      .then(comment => comment.destroy()
+        .then(() => res.redirect(`/restaurants/${comment.RestaurantId}`)))
   }
 }
 module.exports = commentController

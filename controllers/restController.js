@@ -34,7 +34,9 @@ const restControllers = {
   },
   getRestaurant: (req, res) => {
     Restaurant.findByPk(req.params.id, { include: [Category, { model: Comment, include: [User] }] })
-      .then(restaurant => res.render('restaurant', { restaurant: restaurant.toJSON() })
+      .then(restaurant =>
+        restaurant.increment('viewCounts')
+          .then(restaurant => res.render('restaurant', { restaurant: restaurant.toJSON() }))
       )
   },
   getFeeds: (req, res) => {
@@ -46,7 +48,8 @@ const restControllers = {
   goDashboard: (req, res) => {
     return Promise.all([Comment.findAndCountAll({ where: { RestaurantId: req.params.id } }),
     Restaurant.findByPk(req.params.id, { include: [Category] })])
-      .then(([comments, restaurant]) => res.render('dashboard', { restaurant: restaurant.toJSON(), count: comments.count }))
+      .then(([comments, restaurant]) => res.render('dashboard', { restaurant: restaurant.toJSON(), count: comments.count, viewCounts: restaurant.toJSON().viewCounts })
+      )
   }
 }
 
