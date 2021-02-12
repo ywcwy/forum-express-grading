@@ -26,17 +26,20 @@ const restControllers = {
         const data = result.rows.map(r => ({
           ...r.dataValues,
           description: r.dataValues.description.substring(0, 50),
-          categoryName: r.Category.name
+          categoryName: r.Category.name,
+          isFavorited: req.user.FavoritedRestaurants.map(d => d.id).includes(r.id) //用 Array 的 includes 方法進行比對，最後會回傳布林值。看看現在這間餐廳是不是有被使用者收藏
         }))
         Category.findAll({ raw: true, nest: true })
           .then(categories => res.render('restaurants', { restaurants: data, categories, categoryId, totalPages, next, prev }))
       })
   },
   getRestaurant: (req, res) => {
-    Restaurant.findByPk(req.params.id, { include: [Category, { model: Comment, include: [User] }] })
-      .then(restaurant =>
+    Restaurant.findByPk(req.params.id, { include: [Category, { model: User, as: 'FavoritedUsers' }, { model: Comment, include: [User] }] })
+      .then(restaurant => {
+        const isFavorited = restaurant.FavoritedUsers.map(d => d.id).includes(req.user.id)
         restaurant.increment('viewCounts')
-          .then(restaurant => res.render('restaurant', { restaurant: restaurant.toJSON() }))
+          .then(restaurant => res.render('restaurant', { restaurant: restaurant.toJSON(), isFavorited }))
+      }
       )
   },
   getFeeds: (req, res) => {
