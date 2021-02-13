@@ -3,6 +3,7 @@ const Restaurant = db.Restaurant
 const Category = db.Category
 const Comment = db.Comment
 const User = db.User
+const Favorite = db.Favorite
 const helpers = require('../_helpers')
 const pageLimit = 9 // 一頁限九筆資料
 const restControllers = {
@@ -55,6 +56,20 @@ const restControllers = {
     return Promise.all([Comment.findAndCountAll({ where: { RestaurantId: req.params.id } }),
     Restaurant.findByPk(req.params.id, { include: [Category] })])
       .then(([comments, restaurant]) => res.render('dashboard', { restaurant: restaurant.toJSON(), count: comments.count, viewCounts: restaurant.toJSON().viewCounts }))
+  },
+  getTopRestaurant: (req, res) => {
+    Restaurant.findAll({ include: [{ model: User, as: 'FavoritedUsers' }, { model: User, as: 'LikedUsers' }] })
+      .then(restaurants => {
+        restaurants = restaurants.map(restaurant => ({
+          ...restaurant.dataValues,
+          description: restaurant.dataValues.description.substring(0, 50),
+          FavoriteCount: restaurant.FavoritedUsers.length,
+          isFavorited: req.user.FavoritedRestaurants.map(d => d.id).includes(restaurant.id),
+          isLiked: req.user.LikedRestaurants.map(d => d.id).includes(restaurant.id)
+        }))
+        restaurants = restaurants.sort((a, b) => b.FavoriteCount - a.FavoriteCount).slice(0, 11)
+        return res.render('topRestaurant', { restaurants })
+      })
   }
 }
 

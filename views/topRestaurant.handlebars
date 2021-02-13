@@ -1,29 +1,20 @@
 <ul class="nav nav-tabs">
   <li class="nav-item">
-    <a class="nav-link active" href="/restaurants">首頁</a>
+    <a class="nav-link" href="/restaurants">首頁</a>
   </li>
   <li class="nav-item">
     <a class="nav-link" href="/restaurants/feeds">最新動態</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="/restaurants/top">TOP 10 人氣餐廳</a>
+    <a class="nav-link active" href="/restaurants/top">TOP 10 人氣餐廳</a>
   </li>
   <li class="nav-item">
     <a class="nav-link" href="/users/top">美食達人</a>
   </li>
 </ul>
-<br />
-<ul class="nav nav-pills">
-  <li class="nav-item">
-    <a href="?categoryId=" class="nav-link {{#ifSelected '' categoryId}}active{{/ifSelected}}">全部</a>
-  </li>
-  {{#each categories}}
-  <li class="nav-item">
-    <a href="?categoryId={{this.id}}"
-      class="nav-link {{#ifSelected this.id ../categoryId}}active{{/ifSelected}}">{{this.name}}</a>
-  </li>
-  {{/each}}
-</ul>
+<br /><br />
+<h1>人氣餐廳</h1>
+<hr />
 <br />
 <div class="row">
   {{#each restaurants}}
@@ -36,7 +27,7 @@
             {{this.name}}
           </a>
         </p>
-        <span class="badge badge-secondary">{{this.categoryName}}</span>
+        <span class="badge badge-secondary">收藏人數：{{this.FavoriteCount}}</span>
         <p class="card-text">{{this.description}}</p>
         <div class="d-inline">
           {{#if this.isFavorited}}
@@ -63,26 +54,3 @@
   </div>
   {{/each}}
 </div>
-<br />
-<br />
-<nav aria-label="Page navigation example">
-  <ul class="pagination">
-    <li class="page-item">
-      <a class="page-link" href="/restaurants?page={{prev}}&categoryId={{categoryId}}" aria-label="Previous">
-        <span aria-hidden="true">&laquo;</span>
-      </a>
-    </li>
-    {{#each totalPages}}
-    {{#ifSelected this ../page}}
-    <li class="page-item active"><a class="page-link" href="#">{{this}}</a></li>
-    {{else}}
-    <li class="page-item"><a class="page-link"
-        href="/restaurants?page={{this}}&categoryId={{../categoryId}}">{{this}}</a></li>
-    {{/ifSelected}}
-    {{/each}}
-    <a class="page-link" href="/restaurants?page={{next}}&categoryId={{categoryId}}" aria-label="Next">
-      <span aria-hidden="true">&raquo;</span>
-    </a>
-    </li>
-  </ul>
-</nav>
