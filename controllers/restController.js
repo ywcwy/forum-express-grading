@@ -3,6 +3,7 @@ const Restaurant = db.Restaurant
 const Category = db.Category
 const Comment = db.Comment
 const User = db.User
+const helpers = require('../_helpers')
 const pageLimit = 9 // 一頁限九筆資料
 const restControllers = {
   getRestaurants: (req, res) => {
@@ -27,20 +28,22 @@ const restControllers = {
           ...r.dataValues,
           description: r.dataValues.description.substring(0, 50),
           categoryName: r.Category.name,
-          isFavorited: req.user.FavoritedRestaurants.map(d => d.id).includes(r.id) //用 Array 的 includes 方法進行比對，最後會回傳布林值。看看現在這間餐廳是不是有被使用者收藏
+          isFavorited: req.user.FavoritedRestaurants.map(d => d.id).includes(r.id), //用 Array 的 includes 方法進行比對，最後會回傳布林值。看看現在這間餐廳是不是有被使用者收藏
+          isLiked: req.user.LikedRestaurants.map(d => d.id).includes(r.id)
         }))
         Category.findAll({ raw: true, nest: true })
           .then(categories => res.render('restaurants', { restaurants: data, categories, categoryId, totalPages, next, prev }))
       })
   },
   getRestaurant: (req, res) => {
-    Restaurant.findByPk(req.params.id, { include: [Category, { model: User, as: 'FavoritedUsers' }, { model: Comment, include: [User] }] })
+    const userId = helpers.getUser(req).id
+    Restaurant.findByPk(req.params.id, { include: [Category, { model: User, as: 'LikedUsers' }, { model: User, as: 'FavoritedUsers' }, { model: Comment, include: [User] }] })
       .then(restaurant => {
-        const isFavorited = restaurant.FavoritedUsers.map(d => d.id).includes(req.user.id)
+        const isFavorited = restaurant.FavoritedUsers.map(d => d.id).includes(userId)
+        const isLiked = restaurant.LikedUsers.map(d => d.id).includes(userId)
         restaurant.increment('viewCounts')
-          .then(restaurant => res.render('restaurant', { restaurant: restaurant.toJSON(), isFavorited }))
-      }
-      )
+          .then(restaurant => res.render('restaurant', { restaurant: restaurant.toJSON(), isFavorited, isLiked }))
+      })
   },
   getFeeds: (req, res) => {
     return Promise.all([
@@ -51,8 +54,7 @@ const restControllers = {
   goDashboard: (req, res) => {
     return Promise.all([Comment.findAndCountAll({ where: { RestaurantId: req.params.id } }),
     Restaurant.findByPk(req.params.id, { include: [Category] })])
-      .then(([comments, restaurant]) => res.render('dashboard', { restaurant: restaurant.toJSON(), count: comments.count, viewCounts: restaurant.toJSON().viewCounts })
-      )
+      .then(([comments, restaurant]) => res.render('dashboard', { restaurant: restaurant.toJSON(), count: comments.count, viewCounts: restaurant.toJSON().viewCounts }))
   }
 }
 
