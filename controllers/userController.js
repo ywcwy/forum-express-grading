@@ -46,9 +46,21 @@ const userController = {
   getUser: (req, res) => {
     return Promise.all([
       User.findByPk(req.params.id, { raw: true }),
-      Comment.findAll({ where: { UserId: req.params.id }, raw: true, nest: true, include: [Restaurant, User] })
+      Comment.findAll({ where: { UserId: req.params.id }, raw: true, nest: true, include: [Restaurant, User] }),
+      Restaurant.findAll({ raw: true, nest: true, include: [{ model: User, as: 'FavoritedUsers', where: { id: req.params.id } }] }), // userId 固定，算有多少favoriteRestaurants
+      User.findAll({ raw: true, nest: true, include: [{ model: User, as: 'Followers', where: { id: req.params.id } }] }), // followerid 固定，算有多少following
+      User.findAll({ raw: true, nest: true, include: [{ model: User, as: 'Followings', where: { id: req.params.id } }] }) // followingid 固定，算有多少follower
     ])
-      .then(([user, comments]) => res.render('user', { users: user, totalComment: comments.length, comments }))
+      .then(([user, comments, favoriteRestaurants, followings, followers]) => {
+        console.log('followers:' + followers)
+        console.log('following:' + followings)
+        console.log('favoriteRestaurants:' + favoriteRestaurants)
+        const totalComment = comments.length
+        const totalFavoriteRestaurants = favoriteRestaurants.length
+        const totalFollowers = followers.length
+        const totalFollowings = followings.length
+        res.render('user', { users: user, totalComment, comments, favoriteRestaurants, totalFavoriteRestaurants, followers, totalFollowers, followings, totalFollowings })
+      })
   },
   editUser: (req, res) => {
     User.findByPk(req.params.id)
@@ -129,7 +141,9 @@ const userController = {
         }))
         // 依追蹤者人數排序清單
         users = users.sort((a, b) => b.FollowerCount - a.FollowerCount)
-        return res.render('topUser', { users })
+        // 排除追蹤自己
+        const me = helpers.getUser(req).id
+        return res.render('topUser', { users, me })
       })
   },
   addFollowing: (req, res) => {

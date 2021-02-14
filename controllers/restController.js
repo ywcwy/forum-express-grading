@@ -3,7 +3,6 @@ const Restaurant = db.Restaurant
 const Category = db.Category
 const Comment = db.Comment
 const User = db.User
-const Favorite = db.Favorite
 const helpers = require('../_helpers')
 const pageLimit = 9 // 一頁限九筆資料
 const restControllers = {
@@ -64,8 +63,8 @@ const restControllers = {
           ...restaurant.dataValues,
           description: restaurant.dataValues.description.substring(0, 50),
           FavoriteCount: restaurant.FavoritedUsers.length,
-          isFavorited: req.user.FavoritedRestaurants.map(d => d.id).includes(restaurant.id),
-          isLiked: req.user.LikedRestaurants.map(d => d.id).includes(restaurant.id)
+          isFavorited: helpers.getUser(req).FavoritedRestaurants.map(d => d.id).includes(restaurant.id),
+          isLiked: helpers.getUser(req).LikedRestaurants.map(d => d.id).includes(restaurant.id)
         }))
         restaurants = restaurants.sort((a, b) => b.FavoriteCount - a.FavoriteCount).slice(0, 11)
         return res.render('topRestaurant', { restaurants })

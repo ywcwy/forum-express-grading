@@ -1,15 +1,14 @@
-<div class="d-grid my-5 bg-white border border-light" width="400px" height="200px">
+<div class="my-2 bg-white border border-light" width="1000px" height="200px">
   <div class="ml-3 row">
-    <img src="{{users.image}}" alt="{{users.name}}" class="col-6 m-3 img-thumbnail rounded"
-      style="max-width: 210px; height: 210px; object-fit: cover">
+    <img src="{{users.image}}" alt="{{users.name}}" class=" m-3 img-thumbnail rounded"
+      style="width: 210px; height: 210px; object-fit: cover">
     <div class="col-6">
       <h4 class="my-4 ml-3">{{users.name}}</h4>
-      <p class="my-4 ml-3">{{users.email}}</p>
-      {{#if comments}}
-      <p class="my-4 ml-3">已評論餐廳：{{totalComment}} 則</p>
-      {{else}}
-      <p class="my-4 ml-3">已評論餐廳：0 則</p>
-      {{/if}}
+      <p class="my-3 ml-3">{{users.email}}</p>
+      <p class="mb-1 ml-3"><b>{{totalComment}}</b> 已評論餐廳</p>
+      <p class="mb-1 ml-3"><b>{{totalFavoriteRestaurants}}</b> 收藏的餐廳</p>
+      <p class="mb-1 ml-3"><b>{{totalFollowings}}</b> followings（追蹤者）</p>
+      <p class="ml-3"><b>{{totalFollowers}}</b> followers（追隨者）</p>
       {{#ifSelected users.id user.id}}
       <form action="/users/{{users.id}}/edit" method="GET">
         <button class="btn btn-info ml-3 mb-3">Edit</button>
@@ -18,14 +17,49 @@
     </div>
   </div>
 </div>
-{{#if comments}}
-<div class="my-5 border border-secondary p-4" width="400px">
-  <h5 class="mb-4">已評論的餐廳</h5>
-  <div class="bg-white d-flex flex-wrap">
-    {{#each comments}}
-    <a href="/restaurants/{{this.Restaurant.id}}" class="justify-content-around"><img src="{{this.Restaurant.image}}"
-        class="img-thumbnail m-3" width="180px" height="180px"></a>
-    {{/each}}
+
+<div class="row">
+  <div class="col-4">
+    <div class="card">
+      <h5 class="card-header"><b>{{totalFollowings}}</b> followings（追蹤者）</h5>
+      <div class="card-body">
+        {{#each followings}}
+        <a href="/users/{{this.id}}" class="card-text justify-content-around"><img src="{{this.image}}"
+            class="img-thumbnail m-3 rounded" style="width: 100px; height: 100px; object-fit: cover"></a>
+        {{/each}}
+      </div>
+    </div>
+    <br /><br />
+    <div class="card">
+      <h5 class="card-header"><b>{{totalFollowers}}</b> followers（追隨者）</h5>
+      <div class="card-body">
+        {{#each followers}}
+        <a href="/users/{{this.id}}" class="card-text justify-content-around"><img src="{{this.image}}"
+            class="img-thumbnail m-3 rounded" style="width: 100px; height: 100px; object-fit: cover"></a>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+  <div class="col-8">
+    <div class="card">
+      <h5 class="card-header"><b>{{totalComment}}</b> 已評論的餐廳</h5>
+      <div class="card-body">
+        {{#each comments}}
+        <a href="/restaurants/{{this.Restaurant.id}}" class="card-text justify-content-around"><img
+            src="{{this.Restaurant.image}}" class="img-thumbnail m-3 rounded"
+            style="width: 100px; height: 100px; object-fit: cover"></a>
+        {{/each}}
+      </div>
+    </div>
+    <br /><br />
+    <div class="card">
+      <h5 class="card-header"><b>{{totalFavoriteRestaurants}}</b> 收藏的餐廳</h5>
+      <div class="card-body">
+        {{#each favoriteRestaurants}}
+        <a href="/restaurants/{{this.id}}" class="card-text justify-content-around"><img src="{{this.image}}"
+            class="img-thumbnail m-3 rounded" style="width: 100px; height: 100px; object-fit: cover"></a>
+        {{/each}}
+      </div>
+    </div>
   </div>
 </div>
-{{/if}}
