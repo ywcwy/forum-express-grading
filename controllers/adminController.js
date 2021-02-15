@@ -13,9 +13,7 @@ const adminController = {
   },
   createRestaurant: (req, res) => {
     Category.findAll({ raw: true, nest: true })
-      .then(categories => {
-        res.render('admin/create', { categories })
-      })
+      .then(categories => res.render('admin/create', { categories }))
   },
   postRestaurant: (req, res) => {
     const { name, tel, address, opening_hours, description } = req.body
@@ -42,8 +40,9 @@ const adminController = {
     }
   },
   getRestaurant: (req, res) => {
-    Restaurant.findByPk(req.params.id, { include: [Category] })
-      .then(restaurant => res.render('admin/restaurant', { restaurant: restaurant.toJSON() }))
+    adminService.getRestaurant(req, res, (data) => {
+      return res.render('admin/restaurant', data)
+    })
   },
   editRestaurant: (req, res) => {
     return Promise.all([Category.findAll({ raw: true, nest: true }), Restaurant.findByPk(req.params.id, { raw: true })])
