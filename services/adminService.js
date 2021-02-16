@@ -35,7 +35,29 @@ const adminService = {
       return Restaurant.create({ name, tel, address, opening_hours, description, image: null, CategoryId: req.body.categoryId })
         .then(() => callback({ status: 'success', message: '餐廳新增成功。' }))
     }
+  },
+  putRestaurant: (req, res, callback) => {
+    const { name, tel, address, opening_hours, description } = req.body
+    const { file } = req
+    if (!name) { callback({ status: 'error', message: '請填寫餐廳名稱。' }) }
+    if (file) {
+      imgur.setClientID(IMGUR_CLIENT_ID)
+      imgur.upload(file.path, (err, img) => {
+        return Restaurant.findByPk(req.params.id)
+          .then(restaurant => {
+            restaurant.update({ name, tel, address, opening_hours, description, image: file ? img.data.link : restaurant.image, CategoryId: req.body.categoryId })
+              .then(() => callback({ status: 'success', message: '餐廳更新成功。' }))
+          })
+      })
+    } else {
+      return Restaurant.findByPk(req.params.id)
+        .then(restaurant => {
+          restaurant.update({ name, tel, address, opening_hours, description, image: restaurant.image, CategoryId: req.body.categoryId })
+            .then(() => callback({ status: 'success', message: '餐廳更新成功。' }))
+        })
+    }
   }
 }
+
 
 module.exports = adminService
