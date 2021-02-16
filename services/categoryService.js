@@ -31,6 +31,13 @@ const categoryService = {
           .then(() => callback({ status: 'success', message: '分類名稱已更新' }))
       )
   },
+  deleteCategory: (req, res, callback) => {
+    Category.findByPk(req.params.id)
+      .then(category => {
+        category.destroy()
+          .then(() => callback({ status: 'success', message: '' }))
+      })
+  }
 }
 
 module.exports = categoryService
