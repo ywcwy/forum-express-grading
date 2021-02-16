@@ -12,7 +12,13 @@ const categoryService = {
         }
         return callback({ categories })
       })
-  }
+  },
+  postCategory: (req, res, callback) => {
+    const { name } = req.body
+    if (!name) { return callback({ status: 'error', message: '請新增分類名稱' }) }
+    return Category.create({ name })
+      .then(() => callback({ status: 'success', message: '' }))
+  },
 }
 
 module.exports = categoryService
