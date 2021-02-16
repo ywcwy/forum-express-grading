@@ -2,6 +2,8 @@ const db = require('../models')
 const categoryService = require('./categoryService')
 const Restaurant = db.Restaurant
 const Category = db.Category
+const imgur = require('imgur-node-api')
+const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
 
 const adminService = {
   getRestaurants: (req, res, callback) => {
@@ -18,6 +20,21 @@ const adminService = {
         restaurant.destroy()
           .then(() => callback({ status: 'success', message: '' }))
       })
+  },
+  postRestaurant: (req, res, callback) => {
+    const { name, tel, address, opening_hours, description } = req.body
+    const { file } = req
+    if (!name) { callback({ status: 'error', message: '請填寫餐廳名稱。' }) }
+    if (file) {
+      imgur.setClientID(IMGUR_CLIENT_ID)
+      imgur.upload(file.path, (err, img) => {
+        return Restaurant.create({ name, tel, address, opening_hours, description, image: file ? img.data.link : null, CategoryId: req.body.categoryId })
+          .then(() => callback({ status: 'success', message: '餐廳新增成功。' }))
+      })
+    } else {
+      return Restaurant.create({ name, tel, address, opening_hours, description, image: null, CategoryId: req.body.categoryId })
+        .then(() => callback({ status: 'success', message: '餐廳新增成功。' }))
+    }
   }
 }
 
